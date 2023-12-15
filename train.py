@@ -94,7 +94,8 @@ if __name__ == '__main__':
     net = SegmentModel(output_size=(128, 128), node=BiasLIFNode, step=step)
     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, eta_min=0, T_max=num_epochs)
-    train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs, losstype='crossentropy')#'crossentropy')
+    train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs,
+          losstype='crossentropy')  # 'crossentropy')
 
     # net.load_state_dict(torch.load("./CIFAR10_VGG16.pth", map_location=device))
     net = net.to(device)

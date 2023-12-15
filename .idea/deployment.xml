@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="weiyh@127.0.0.1:8000 password (3)" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="weiyh@127.0.0.1:8000 password" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
     <serverData>
-      <paths name="weiyh@127.0.0.1:8000 password (1)">
+      <paths name="segment_snn">
         <serverdata>
           <mappings>
-            <mapping deploy="/data/data_disk/weiyh/projects/segment_snn" local="$PROJECT_DIR$" />
+            <mapping deploy="/" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
-      <paths name="weiyh@127.0.0.1:8000 password (3)">
+      <paths name="weiyh@127.0.0.1:8000 password">
         <serverdata>
           <mappings>
             <mapping deploy="/" local="$PROJECT_DIR$" />

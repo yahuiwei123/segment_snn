@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="9e3da6c3-7dfe-4a9e-aca7-d5e404c9379d" name="segment_snn">
+        <fileTransfer rootFolder="/data/data_disk/weiyh/projects/segment_snn" accessType="SFTP" host="127.0.0.1" port="8000" sshConfigId="96405e0f-c291-476d-b46b-864b080ebc96" sshConfig="weiyh@127.0.0.1:8000 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
