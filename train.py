@@ -59,6 +59,10 @@ def train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs, 
             best = test_acc
             torch.save(net.state_dict(), './checkpoints/CIFAR10_VGG16.pth')
 
+def estimate_dice(gt_msk, prt_msk):
+    intersection = gt_msk * prt_msk
+    dice = 2 * float(intersection.sum()) / float(gt_msk.sum() + prt_msk.sum())
+    return dice
 
 def evaluate_accuracy(data_iter, net, device=None, only_onebatch=False):
     if device is None and isinstance(net, torch.nn.Module):
@@ -67,7 +71,11 @@ def evaluate_accuracy(data_iter, net, device=None, only_onebatch=False):
     with torch.no_grad():
         for X, y in data_iter:
             net.eval()
-            acc_sum += (net(X.to(device)).argmax(dim=1) == y.to(device)).float().sum().cpu().item()
+            logits = net(X.to(device))
+            softmax = nn.Softmax(dim=1)
+            logits = softmax(logits)
+            mask = torch.argmax(logits, dim=1)
+            acc_sum += estimate_dice(mask, y)
             net.train()
             n += y.shape[0]
 
