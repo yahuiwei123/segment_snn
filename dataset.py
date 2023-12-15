@@ -122,8 +122,9 @@ class COCOSegmentation(SegmentationDataset):
     >>>     trainset, 4, shuffle=True,
     >>>     num_workers=4)
     """
-    CAT_LIST = [1, 2, 3, 4, 5, 6, 7, 9, 16, 17, 18, 19, 20, 21, 44, 62, 72]
-    NUM_CLASS = len(CAT_LIST)
+    CAT_LIST = [0, 5, 2, 16, 9, 44, 6, 3, 17, 62, 21, 67, 18, 19, 4,
+                1, 64, 20, 63, 7, 72]
+    NUM_CLASS = 21
 
     def __init__(self, root='../datasets/coco', annotation_root='', split='train', mode=None, transform=None, stride=1, **kwargs):
         super(COCOSegmentation, self).__init__(root, split, mode, transform, **kwargs)
