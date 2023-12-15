@@ -7,13 +7,13 @@ from braincog.base.node.node import *
 
 
 class SegmentModel(nn.Module):
-    def __init__(self, output_size, node=BiasLIFNode, step=6):
+    def __init__(self, output_size, out_cls, node=BiasLIFNode, step=6):
         super(SegmentModel, self).__init__()
         self.output_size = output_size
         self.node = node
         self.step = step
-        self.encoder = VGG16()
-        self.decoder = FPNSegmentationHead(512, 13,
+        self.encoder = VGG16(out_cls=out_cls, step=step)
+        self.decoder = FPNSegmentationHead(512, out_cls,
                                            decode_intermediate_input=True,
                                            shortcut_dims=[64, 128, 256, 512],
                                            node=node,

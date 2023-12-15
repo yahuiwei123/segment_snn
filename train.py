@@ -91,7 +91,7 @@ if __name__ == '__main__':
     print('dataloader finished')
 
     lr, num_epochs = 0.01, 300
-    net = SegmentModel(output_size=(128, 128), node=BiasLIFNode, step=step)
+    net = SegmentModel(output_size=(128, 128), out_cls=train_dataset.num_class, node=BiasLIFNode, step=step)
     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, eta_min=0, T_max=num_epochs)
     train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs,
