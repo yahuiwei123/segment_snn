@@ -1,6 +1,7 @@
 import sys
 
 import torch
+from torch.utils.data import DataLoader
 
 sys.path.append('../../..')
 import torchvision.transforms as transforms
@@ -14,38 +15,6 @@ from model import SegmentModel
 
 device = torch.device('cuda:5' if torch.cuda.is_available() else 'cpu')
 DATA_DIR = '/data/datasets'
-
-
-def get_cifar10_loader(batch_size, train_batch=None, num_workers=4, conversion=False, distributed=False):
-    normalize = transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
-    # transform_train = transforms.Compose([transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip(),
-    #                                         CIFAR10Policy(),
-    #                                         transforms.ToTensor(),
-    #                                         Cutout(n_holes=1, length=16),
-    #                                         normalize])
-    transform_train = transforms.Compose([transforms.RandomCrop(32, padding=4), transforms.RandomHorizontalFlip(),
-                                          transforms.ToTensor(),
-                                          normalize])
-    transform_test = transforms.Compose([transforms.ToTensor(), normalize])
-    train_batch = batch_size if train_batch is None else train_batch
-    cifar10_train = datasets.CIFAR10(root=DATA_DIR, train=True, download=False,
-                                     transform=transform_test if conversion else transform_train)
-    cifar10_test = datasets.CIFAR10(root=DATA_DIR, train=False, download=False, transform=transform_test)
-
-    if distributed:
-        train_sampler = torch.utils.data.distributed.DistributedSampler(cifar10_train)
-        val_sampler = torch.utils.data.distributed.DistributedSampler(cifar10_test, shuffle=False, drop_last=True)
-        train_iter = torch.utils.data.DataLoader(cifar10_train, batch_size=train_batch, shuffle=False,
-                                                 num_workers=num_workers, pin_memory=True, sampler=train_sampler)
-        test_iter = torch.utils.data.DataLoader(cifar10_test, batch_size=batch_size, shuffle=False,
-                                                num_workers=num_workers, pin_memory=True, sampler=val_sampler)
-    else:
-        train_iter = torch.utils.data.DataLoader(cifar10_train, batch_size=train_batch, shuffle=True,
-                                                 num_workers=num_workers, pin_memory=True)
-        test_iter = torch.utils.data.DataLoader(cifar10_test, batch_size=batch_size, shuffle=False,
-                                                num_workers=num_workers, pin_memory=True)
-
-    return train_iter, test_iter
 
 
 def train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs, losstype='mse'):
@@ -112,9 +81,13 @@ if __name__ == '__main__':
     torch.backends.cudnn.deterministic = True
 
     batch_size = 8
-    step = 6
-    train_iter, test_iter, _, _ = get_nmnist_data(batch_size, step)
-    # train_iter, test_iter = get_cifar10_loader(batch_size)
+    step = 8
+
+    # get coco dataset
+    train_dataset = SegmentationDataset()
+    train_iter = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0)
+    test_dataset = SegmentationDataset()
+    test_iter = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, num_workers=0)
     print('dataloader finished')
 
     lr, num_epochs = 0.01, 300
