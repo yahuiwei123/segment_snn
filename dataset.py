@@ -244,7 +244,7 @@ class COCOSegmentation(SegmentationDataset):
                 'tv')
     
     def __len__(self):
-        return len(self.root)
+        return len(self.ids)
 
 if __name__ == '__main__':
     input_transform = transforms.Compose([
