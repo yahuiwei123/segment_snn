@@ -3,7 +3,7 @@ from basic import *
 
 
 class VGG16(nn.Module):
-    def __init__(self, node=BiasLIFNode, step=6, **kwargs):  # 1   3e38
+    def __init__(self, node=BiasLIFNode, out_cls=10, step=6, **kwargs):  # 1   3e38
         super(VGG16, self).__init__()
         self.step = step
 
@@ -47,7 +47,7 @@ class VGG16(nn.Module):
             nn.MaxPool2d(2, 2)
         )
 
-        self.fc = LayerWiseLinearModule(512, 10, bias=True, node=BiasLIFNode, step=self.step)
+        self.fc = LayerWiseLinearModule(512, out_cls, bias=True, node=BiasLIFNode, step=self.step)
         # self.node = partial(node, **kwargs)()
 
     def forward(self, input):
