@@ -1,53 +1,70 @@
 from torch import nn
 from basic import *
 
+"""
+  平均池化后做差
+   kernel_size:平均池化窗口大小
+   """
+kernel_size = 2
+class CustomAvgPool2d(nn.Module):
+    def __init__(self, kernel_size, stride, padding):
+        super(CustomAvgPool2d, self).__init__()
+        self.avgpool = nn.AvgPool2d(kernel_size, stride, padding)
+
+    def forward(self, x):
+        pooled = self.avgpool(x)
+        upsampled = F.interpolate(pooled, scale_factor=kernel_size, mode='nearest')
+        diff = x - upsampled
+        return diff
 
 class VGG16(nn.Module):
-    def __init__(self, node=BiasLIFNode, out_cls=10, step=6, **kwargs):  # 1   3e38
+    def __init__(self, node=DoubleSidePLIFNode, out_cls=10, step=6, **kwargs):  # 1   3e38
         super(VGG16, self).__init__()
+        self.node = node
         self.step = step
-
+        self.custom_avg_pool = CustomAvgPool2d(kernel_size=2, stride=2, padding=0)
         self.downsample_2x = nn.Sequential(
             LayerWiseConvModule(2, 64, 3, 1, 1, node=BiasLIFNode, step=self.step),
             TEP(step=self.step, channel=64, device=None, dtype=None),
             LayerWiseConvModule(64, 64, 3, 1, 1, node=BiasLIFNode, step=self.step),
             TEP(step=self.step, channel=64, device=None, dtype=None),
+            self.custom_avg_pool,
             nn.MaxPool2d(2, 2)
         )
 
         self.downsample_4x = nn.Sequential(
-            LayerWiseConvModule(64, 128, 3, 1, 1, node=BiasLIFNode, step=self.step),
+            LayerWiseConvModule(64, 128, 3, 1, 1, node=DoubleSidePLIFNode, step=self.step),
             TEP(step=self.step, channel=128, device=None, dtype=None),
-            LayerWiseConvModule(128, 128, 3, 1, 1, node=BiasLIFNode, step=self.step),
+            LayerWiseConvModule(128, 128, 3, 1, 1, node=DoubleSidePLIFNode, step=self.step),
             TEP(step=self.step, channel=128, device=None, dtype=None),
             nn.MaxPool2d(2, 2)
         )
 
         self.downsample_8x = nn.Sequential(
-            LayerWiseConvModule(128, 256, 3, 1, 1, node=BiasLIFNode, step=self.step),
+            LayerWiseConvModule(128, 256, 3, 1, 1, node=DoubleSidePLIFNode, step=self.step),
             TEP(step=self.step, channel=256, device=None, dtype=None),
-            LayerWiseConvModule(256, 256, 3, 1, 1, node=BiasLIFNode, step=self.step),
+            LayerWiseConvModule(256, 256, 3, 1, 1, node=DoubleSidePLIFNode, step=self.step),
             TEP(step=self.step, channel=256, device=None, dtype=None),
             nn.MaxPool2d(2, 2)
         )
 
         self.downsample_16x = nn.Sequential(
-            LayerWiseConvModule(256, 512, 3, 1, 1, node=BiasLIFNode, step=self.step),
+            LayerWiseConvModule(256, 512, 3, 1, 1, node=DoubleSidePLIFNode, step=self.step),
             TEP(step=self.step, channel=512, device=None, dtype=None),
-            LayerWiseConvModule(512, 512, 3, 1, 1, node=BiasLIFNode, step=self.step),
+            LayerWiseConvModule(512, 512, 3, 1, 1, node=DoubleSidePLIFNode, step=self.step),
             TEP(step=self.step, channel=512, device=None, dtype=None),
             nn.MaxPool2d(2, 2)
         )
 
         self.downsample_32x = nn.Sequential(
-            LayerWiseConvModule(512, 512, 3, 1, 1, node=BiasLIFNode, step=self.step),
+            LayerWiseConvModule(512, 512, 3, 1, 1, node, step=self.step),
             TEP(step=self.step, channel=512, device=None, dtype=None),
-            LayerWiseConvModule(512, 512, 3, 1, 1, node=BiasLIFNode, step=self.step),
+            LayerWiseConvModule(512, 512, 3, 1, 1, node, step=self.step),
             TEP(step=self.step, channel=512, device=None, dtype=None),
             nn.MaxPool2d(2, 2)
         )
 
-        self.fc = LayerWiseLinearModule(512, out_cls, bias=True, node=BiasLIFNode, step=self.step)
+        self.fc = LayerWiseLinearModule(512, out_cls, bias=True, node=DoubleSidePLIFNode, step=self.step)
         # self.node = partial(node, **kwargs)()
 
     def forward(self, input):

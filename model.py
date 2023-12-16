@@ -12,7 +12,7 @@ class SegmentModel(nn.Module):
         self.output_size = output_size
         self.node = node
         self.step = step
-        self.encoder = VGG16(out_cls=out_cls, step=step)
+        self.encoder = VGG16(out_cls=out_cls,node=DoubleSidePLIFNode, step=step)
         self.decoder = FPNSegmentationHead(512, out_cls,
                                            decode_intermediate_input=True,
                                            shortcut_dims=[64, 128, 256, 512],
