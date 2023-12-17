@@ -200,6 +200,21 @@ class COCOSegmentation(SegmentationDataset):
                 mask[:, :] += (mask == 0) * (((np.sum(m, axis=2)) > 0) * c).astype(np.uint8)
         return mask
 
+    # def generate_dynamic_translation(self, image):
+    #     tracex = self.stride * 2 * np.array([0, 2, 1, 0, 2, 1, 1, 2, 1])
+    #     tracey = self.stride * 2 * np.array([0, 1, 2, 1, 0, 2, 1, 1, 2])
+    #
+    #     num_frames = len(tracex)
+    #     channel = image.shape[0]
+    #     height = image.shape[1]
+    #     width = image.shape[2]
+    #
+    #     frames = torch.zeros((num_frames, channel, height, width))
+    #     for i in range(num_frames):
+    #         anchor_x = tracex[i]
+    #         anchor_y = tracey[i]
+    #         frames[i, :, anchor_y // 2: height - anchor_y // 2, anchor_x // 2: width - anchor_x // 2] = image[:, anchor_y:, anchor_x:]
+    #     return frames
     def generate_dynamic_translation(self, image):
         tracex = self.stride * 2 * np.array([0, 2, 1, 0, 2, 1, 1, 2, 1])
         tracey = self.stride * 2 * np.array([0, 1, 2, 1, 0, 2, 1, 1, 2])
@@ -208,14 +223,16 @@ class COCOSegmentation(SegmentationDataset):
         channel = image.shape[0]
         height = image.shape[1]
         width = image.shape[2]
-        
+
         frames = torch.zeros((num_frames, channel, height, width))
+        image_copy = image.copy()
+        image_tensor = torch.from_numpy(image_copy)
         for i in range(num_frames):
             anchor_x = tracex[i]
             anchor_y = tracey[i]
-            frames[i, :, anchor_y // 2: height - anchor_y // 2, anchor_x // 2: width - anchor_x // 2] = image[:, anchor_y:, anchor_x:]
+            frames[i, :, anchor_y // 2: height - anchor_y // 2, anchor_x // 2: width - anchor_x // 2] = image_tensor[:,anchor_y:, anchor_x:]
         return frames
-    
+
     def _preprocess(self, ids, ids_file):
         print("Preprocessing mask, this will take a while." + \
               "But don't worry, it only run once for each split.")

@@ -51,6 +51,8 @@ class FPNSegmentationHead(nn.Module):
         self.reset()
 
         inputs = rearrange(inputs, 't b c w h -> (t b) c w h')
+        # print("fph-input.shape")
+        # print(inputs.shape)
         for i in range(len(shortcuts)):
             shortcuts[i] = rearrange(shortcuts[i], 't b c w h -> (t b) c w h')
 
@@ -88,6 +90,8 @@ class FPNSegmentationHead(nn.Module):
         x = self.tep_2x(self.conv_2x(self.adapter_2x(shortcuts[-4]) + x))
 
         x = self.conv_out(x)
+        # print("fpn-output")
+        # print(x.shape)
 
         return x
 

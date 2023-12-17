@@ -24,6 +24,8 @@ class SegmentModel(nn.Module):
         """
         x -> t b c w h
         """
+        # print("segment_input.shape")
+        # print(x.shape)
         embs = self.encoder(x)
         for i in range(len(embs)):
             embs[i] = rearrange(embs[i], '(t b) c w h -> t b c w h', t=self.step)

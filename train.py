@@ -1,5 +1,5 @@
 import sys
-
+import torch.nn.functional as F
 import torch
 from torch.utils.data import DataLoader
 
@@ -9,7 +9,7 @@ import torchvision.datasets as datasets
 from torchvision.transforms import *
 import time
 from braincog.utils import setup_seed
-from dataset import SegmentationDataset
+from dataset import *
 from braincog.base.node.node import *
 from model import SegmentModel
 from tqdm import tqdm
@@ -17,7 +17,7 @@ from torchmetrics import Dice
 import os
 
 
-device = torch.device('cuda:5' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 DATA_DIR = '/data/datasets'
 
 
@@ -50,14 +50,16 @@ def train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs, 
             # X = torch.ones(6, 8, 2, 128, 128).to(device)
             # y = torch.ones(8, 13, 128, 128).to(device)
             y_hat = net(X)
+            y_hat_argmax = torch.argmax(y_hat, dim=1)
             label = y
-            l = loss(y_hat, label)
+            label_resized = F.interpolate(label.unsqueeze(1).float(), size=(128, 128), mode='nearest').squeeze(1).long()
+            l = loss(y_hat, label_resized)
             losss.append(l.cpu().item())
             l.backward()
             optimizer.step()
             train_l_sum += l.cpu().item()
             with torch.no_grad():
-                acc = dice(y_hat.detach(), y.detach())
+                acc = dice(y_hat_argmax.detach(), label_resized.detach())
                 train_acc.append(acc.cpu().item())
             n += y.shape[0]
             batch_count += 1
