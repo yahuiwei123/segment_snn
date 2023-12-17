@@ -90,6 +90,7 @@ def evaluate_accuracy(data_iter, net, device=None, only_onebatch=False):
         for X, y in tbar:
             logits = net(X.to(device))
             y = y.to(device)
+            y = F.interpolate(y.unsqueeze(1).float(), size=(128, 128), mode='nearest').squeeze(1).long()
 #             softmax = nn.Softmax(dim=1)
 #             logits = softmax(logits)
             acc = dice(logits, y.detach())
