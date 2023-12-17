@@ -50,16 +50,14 @@ def train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs, 
             # X = torch.ones(6, 8, 2, 128, 128).to(device)
             # y = torch.ones(8, 13, 128, 128).to(device)
             y_hat = net(X)
-            y_hat_argmax = torch.argmax(y_hat, dim=1)
             label = y
-            label_resized = F.interpolate(label.unsqueeze(1).float(), size=(128, 128), mode='nearest').squeeze(1).long()
-            l = loss(y_hat, label_resized)
+            l = loss(y,label)
             losss.append(l.cpu().item())
             l.backward()
             optimizer.step()
             train_l_sum += l.cpu().item()
             with torch.no_grad():
-                acc = dice(y_hat_argmax.detach(), label_resized.detach())
+                acc = dice(y_hat.detach(), label.detach())
                 train_acc.append(acc.cpu().item())
             n += y.shape[0]
             batch_count += 1
@@ -90,7 +88,6 @@ def evaluate_accuracy(data_iter, net, device=None, only_onebatch=False):
         for X, y in tbar:
             logits = net(X.to(device))
             y = y.to(device)
-            y = F.interpolate(y.unsqueeze(1).float(), size=(128, 128), mode='nearest').squeeze(1).long()
 #             softmax = nn.Softmax(dim=1)
 #             logits = softmax(logits)
             acc = dice(logits, y.detach())
@@ -119,7 +116,7 @@ if __name__ == '__main__':
     print('dataloader finished')
 
     lr, num_epochs = 0.01, 300
-    net = SegmentModel(output_size=(128, 128), out_cls=train_dataset.num_class, node=BiasLIFNode, step=step)
+    net = SegmentModel(output_size=(480, 480), out_cls=train_dataset.num_class, node=BiasLIFNode, step=step)
     optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, eta_min=0, T_max=num_epochs)
     train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs,
