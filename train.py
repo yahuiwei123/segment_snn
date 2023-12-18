@@ -98,7 +98,7 @@ def evaluate_accuracy(data_iter, net, device=None, only_onebatch=False):
             if only_onebatch: 
                 break
     net.train()
-    return acc_sum / n
+    return acc_sum / len(acc)
 
 if __name__ == '__main__':
     setup_seed(42)
