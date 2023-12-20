@@ -9,7 +9,7 @@ Segment_SNN主要实现了一个利用VGG16和FPN作为backbone，采用encoder-
   + xxx
 ##### 模型训练
 ``
-python train.py --batch_size 8 --step 8 --learning_rate 0.01 --num_epochs 100 -output_size (128, 128)
+python train.py --batch_size 8 --step 8 --learning_rate 0.01 --num_epochs 100 -output_size (480, 480)
 ``
 
 ##### 模型预测
