@@ -9,7 +9,7 @@ Segment_SNN主要实现了一个利用VGG16和FPN作为backbone，采用encoder-
   + xxx
 ##### 模型训练
 ``
-python train.py --batch_size 8 --step 8 --learning_rate 0.01 --num_epochs 100 -output_size (128, 128)
+python train.py --batch_size 8 --step 8 --learning_rate 0.01 --num_epochs 100 -output_size (480, 480)
 ``
 
 ##### 模型预测
@@ -22,6 +22,7 @@ python predict.py --image_path './test/img' --step 8 --output_size (128, 128) --
   + Linear $\rightarrow$ LayerWiseLinearModule
   + BatchNorm $\rightarrow$ TEP
 + 对模型使用不同种类神经元类型进行了实验
+  + BiasLIFNode $\rightarrow$ DoubleSidePLIFNode（通过将初始x与avgpool(x)统一维度后做差完成正负脉冲的实现）
 #### 实验效果展示
 
 #### 成员分工
