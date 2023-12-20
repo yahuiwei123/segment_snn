@@ -9,14 +9,14 @@ Segment_SNN主要实现了一个利用VGG16和FPN作为backbone，采用encoder-
   + xxx
   + xxx
 ##### 模型训练
-``
+```python
 python train.py --batch_size 8 --step 8 --learning_rate 0.01 --num_epochs 100 -output_size (480, 480)
-``
+```
 
 ##### 模型预测
-``
+```python
 python predict.py --image_path './test/img' --step 8 --output_size (128, 128) --output_dir './test/out'
-``
+```
 #### 模型细节
 + 对模型中的如下模块进行了替换
   + Conv2D $\rightarrow$ LayerWiseConvModule
