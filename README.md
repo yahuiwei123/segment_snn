@@ -4,8 +4,7 @@ Segment_SNN主要实现了一个利用VGG16和FPN作为backbone，采用encoder-
 #### 使用方式
 ##### 数据集准备
 + 使用coco数据训练
-+ 数据使用快速眼动法生成dvs帧（共9帧）作为模型输入
-方法参考`Lin Y, Ding W, Qiang S, et al. Es-imagenet: A million event-stream classification dataset for spiking neural networks[J]. Frontiers in neuroscience, 2021, 15: 1546.`
++ 数据使用快速眼动法生成dvs帧（共9帧）作为模型输入，方法参考`Lin Y, Ding W, Qiang S, et al. Es-imagenet: A million event-stream classification dataset for spiking neural networks[J]. Frontiers in neuroscience, 2021, 15: 1546.`
 + 如果使用个人数据集，确保包含如下目录和文件
   + xxx
   + xxx
