@@ -1,6 +1,9 @@
+import argparse
 import sys
 
+import numpy as np
 import torch
+from torch import nn
 from torch.utils.data import DataLoader
 
 sys.path.append('../../..')
@@ -57,7 +60,7 @@ def train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs, 
 
         if test_acc > best:
             best = test_acc
-            torch.save(net.state_dict(), './checkpoints/CIFAR10_VGG16.pth')
+            torch.save(net.state_dict(), './checkpoints/Segment_SNN.pth')
 
 def estimate_dice(gt_msk, prt_msk):
     intersection = gt_msk * prt_msk
