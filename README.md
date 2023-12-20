@@ -20,7 +20,7 @@ python train.py --batch_size 8 --step 8 --learning_rate 0.01 --num_epochs 100 -o
   + Linear $\rightarrow$ LayerWiseLinearModule
   + BatchNorm $\rightarrow$ TEP
 + 对模型使用不同种类神经元类型进行了实验
-  + BiasLIFNode $\rightarrow$ DoubleSidePLIFNode（通过将初始x与AvgPool2d做差完成正负脉冲的实现）
+  + BiasLIFNode $\rightarrow$ DoubleSidePLIFNode（通过将初始x与avgpool(x)统一维度后做差完成正负脉冲的实现）
 #### 实验效果展示
 
 #### 成员分工
