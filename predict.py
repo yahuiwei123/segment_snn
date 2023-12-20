@@ -41,6 +41,6 @@ if __name__ == '__main__':
             softmax = nn.Softmax(dim=1)
             logits = softmax(logits)
             mask = torch.argmax(logits, dim=1)
-            cv2.imwrite(output_dir, mask)
+            cv2.imwrite(f"{output_dir}/mask.png", mask)
 
 
