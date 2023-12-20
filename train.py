@@ -88,7 +88,7 @@ if __name__ == '__main__':
     parser.add_argument("-b", "--batch_size", type=int, default=8, help="batch size in training")
     parser.add_argument("-s", "--step", type=int, default=8, help="time slice")
     parser.add_argument("-lr", "--learning_rate", type=float, default=1e-2, help="learning rate in training")
-    parser.add_argument("-e", "--num_epochs", type=int, default=300, help="batch size in training")
+    parser.add_argument("-e", "--num_epochs", type=int, default=300, help="iter num in training")
     parser.add_argument("-os", "--output_size", type=tuple, default=(128, 128), help="size of images(H, W)")
     args = parser.parse_args()
 
