@@ -4,8 +4,15 @@ Segment_SNN主要实现了一个利用VGG16和FPN作为backbone，采用encoder-
 我们的实验主要分为两个阶段
 + 首先是对VGG16网络进行SNN的转换，并将转换后的网络在nminst数据集上进行分类训练，来验证模型转换效果
 + 第二阶段我们对FPN网络也进行了转换，并且将其与上一步转换过的VGG16网络进行拼接得到我们的语义分割模型Segment_SNN
+
 文件内容：
-+ 
++ basic.py文件包含了所有的神经元以及基础模块的定义
++ dataset.py文件定义了数据的预处理方式（包含快速眼动生成序列帧以及数据增强）
++ fpn.py文件包含转换后的脉冲FPN网络
++ vgg16.py文件定义了转换后的脉冲VGG16网路
++ model.py定义了整合VGG和FPN网络的分割模型Segment_SNN
++ train.py包含训练代码
++ predict.py包含预测代码
 ### 使用方式
 #### 数据集准备
 + 使用coco数据训练
