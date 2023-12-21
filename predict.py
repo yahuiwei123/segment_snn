@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     net = SegmentModel(output_size=output_size, out_cls=21, node=BiasLIFNode, step=step)
     # load model
-    torch.load(net, device, './checkpoints/Segment_SNN.pth')
+    net.load_state_dict(torch.load('./checkpoints/Segment_SNN.pth'))
     net = net.to(device)
     with torch.no_grad():
         for (idx, img) in enumerate(test_iter):
