@@ -29,7 +29,7 @@ python predict.py --image_path './test/img' --step 8 --output_size (480, 480) --
   + BiasLIFNode $\rightarrow$ DoubleSidePLIFNode（通过将初始x与avgpool(x)统一维度后做差完成正负脉冲的实现）
 ### 实验效果展示
 #### 第一阶段
-+ 我们在nminst数据集上训练20个epoch后的结果
++ 我们在nminst数据集上训练17个epoch后的结果
 <img width="503" alt="94d9608c9238ed6bfae8465e9da21d9" src="https://github.com/yahuiwei123/segment_snn/assets/84215971/99bc2e72-d151-4a2b-bdce-2b81c9982185">
 
 #### 第二阶段
