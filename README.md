@@ -48,6 +48,7 @@ python predict.py --image_path './test/img' --step 8 --output_size (480, 480) --
 #### 第二阶段（分割）
 由于计算资源有限，仅使用小样本数据集进行训练，数据集分布不均匀，因此模型收敛速度较慢，以下是相应的训练结果。
 + 训练的Kaggle Notebook（包括FCN和SNN）：https://www.kaggle.com/code/littleweakweak/test-pycocotools
+
 后续在增大数据集规模后，可考虑进一步改进模型，以获得更好的训练效果。
 
 ### 成员分工
