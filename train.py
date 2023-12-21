@@ -22,6 +22,10 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 DATA_DIR = '/data/datasets'
 
 
+device = torch.device('cuda:5' if torch.cuda.is_available() else 'cpu')
+DATA_DIR = '/data/datasets'
+
+
 def train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs, save_path='./checkpoints', losstype='mse'):
     best = 0
     net = net.to(device)
@@ -52,7 +56,11 @@ def train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs, 
             # y = torch.ones(8, 13, 128, 128).to(device)
             y_hat = net(X)
             label = y
-            l = loss(y,label)
+            if losstype == 'mse':
+                one_hot_label = F.one_hot(label, 21)
+                l = loss(y_hat.permute(0,2,3,1), one_hot_label.float())
+            else:
+                l = loss(y_hat,label)
             losss.append(l.cpu().item())
             l.backward()
             optimizer.step()
@@ -71,7 +79,8 @@ def train(net, train_iter, test_iter, optimizer, scheduler, device, num_epochs, 
 
         if test_acc > best:
             best = test_acc
-            torch.save(net.state_dict(), os.path.join(save_path, '/SegmentModel.pth'))
+            torch.save(net.state_dict(), os.path.join(save_path, 'SegmentModel.pth'))
+            print('Best model saved! ')
 
 def estimate_dice(gt_msk, prt_msk):
     intersection = gt_msk * prt_msk
@@ -81,25 +90,20 @@ def estimate_dice(gt_msk, prt_msk):
 def evaluate_accuracy(data_iter, net, device=None, only_onebatch=False):
     if device is None and isinstance(net, torch.nn.Module):
         device = list(net.parameters())[0].device
-    acc_sum, n = 0.0, 0
     dice = Dice(average='micro').to(device)
+    acc = []
     net.eval()
     with torch.no_grad():
         tbar = tqdm(data_iter)
         for X, y in tbar:
             logits = net(X.to(device))
             y = y.to(device)
-#             softmax = nn.Softmax(dim=1)
-#             logits = softmax(logits)
-            acc = dice(logits, y.detach())
-            acc_sum += acc.cpu().item()
-            n += y.shape[0]
-            tbar.set_description(f'Validation acc = {acc: .4f}')
-
+            acc.append(dice(logits, y.detach()).item())
+            tbar.set_description(f'Validation acc = {acc[-1]: .4f}')
             if only_onebatch:
                 break
     net.train()
-    return acc_sum / len(acc)
+    return sum(acc) / len(acc)
 
 
 if __name__ == '__main__':

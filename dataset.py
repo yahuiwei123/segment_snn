@@ -96,37 +96,37 @@ class SegmentationDataset(object):
         return 0
 
 class COCOSegmentation(SegmentationDataset):
-    """COCO Semantic Segmentation Dataset for VOC Pre-training.
+    """ 
+    COCO数据集, 参考https://github.com/Tramac/awesome-semantic-segmentation-pytorch
 
-    Parameters
-    ----------
-    root : string
-        Path to ADE20K folder. Default is './datasets/coco'
-    split: string
-        'train', 'val' or 'test'
-    transform : callable, optional
-        A function that transforms the image
-    Examples
-    --------
-    >>> from torchvision import transforms
-    >>> import torch.utils.data as data
-    >>> # Transforms for Normalization
-    >>> input_transform = transforms.Compose([
-    >>>     transforms.ToTensor(),
-    >>>     transforms.Normalize((.485, .456, .406), (.229, .224, .225)),
-    >>> ])
-    >>> # Create Dataset
-    >>> trainset = COCOSegmentation(split='train', transform=input_transform)
-    >>> # Create Training Loader
-    >>> train_data = data.DataLoader(
-    >>>     trainset, 4, shuffle=True,
-    >>>     num_workers=4)
     """
     CAT_LIST = [0, 5, 2, 16, 9, 44, 6, 3, 17, 62, 21, 67, 18, 19, 4,
                 1, 64, 20, 63, 7, 72]
     NUM_CLASS = 21
 
     def __init__(self, root='../datasets/coco', annotation_root='', split='train', mode=None, transform=None, stride=1, **kwargs):
+        """
+        Parameters: 
+        ----------
+        root: 
+            图像文件夹路径, COCO数据集的路径应为root/val2017
+
+        annotation_root: 
+            COCO数据集相应的annotation路径, json文件在annotation_root/annotations下
+
+        split: 
+            'train' / 'val', 对应不同的数据增广方式, 本项目使用val2017的数据 (5000张) 进行训练, 因此将split设为'val'
+
+        mode: 
+            'train' / 'val', 若不指定mode则self.mode = split
+
+        transform: 
+            基本的图像增广 (利用ImageNet的mean和std归一化)
+
+        stride: 
+            快速眼动法的步长
+
+        """
         super(COCOSegmentation, self).__init__(root, split, mode, transform, **kwargs)
         # lazy import pycocotools
         from pycocotools.coco import COCO
@@ -200,21 +200,6 @@ class COCOSegmentation(SegmentationDataset):
                 mask[:, :] += (mask == 0) * (((np.sum(m, axis=2)) > 0) * c).astype(np.uint8)
         return mask
 
-    # def generate_dynamic_translation(self, image):
-    #     tracex = self.stride * 2 * np.array([0, 2, 1, 0, 2, 1, 1, 2, 1])
-    #     tracey = self.stride * 2 * np.array([0, 1, 2, 1, 0, 2, 1, 1, 2])
-    #
-    #     num_frames = len(tracex)
-    #     channel = image.shape[0]
-    #     height = image.shape[1]
-    #     width = image.shape[2]
-    #
-    #     frames = torch.zeros((num_frames, channel, height, width))
-    #     for i in range(num_frames):
-    #         anchor_x = tracex[i]
-    #         anchor_y = tracey[i]
-    #         frames[i, :, anchor_y // 2: height - anchor_y // 2, anchor_x // 2: width - anchor_x // 2] = image[:, anchor_y:, anchor_x:]
-    #     return frames
     def generate_dynamic_translation(self, image):
         tracex = self.stride * 2 * np.array([0, 2, 1, 0, 2, 1, 1, 2, 1])
         tracey = self.stride * 2 * np.array([0, 1, 2, 1, 0, 2, 1, 1, 2])
@@ -223,17 +208,18 @@ class COCOSegmentation(SegmentationDataset):
         channel = image.shape[0]
         height = image.shape[1]
         width = image.shape[2]
-
+        
         frames = torch.zeros((num_frames, channel, height, width))
-        image_copy = image.copy()
-        image_tensor = torch.from_numpy(image_copy)
         for i in range(num_frames):
             anchor_x = tracex[i]
             anchor_y = tracey[i]
-            frames[i, :, anchor_y // 2: height - anchor_y // 2, anchor_x // 2: width - anchor_x // 2] = image_tensor[:,anchor_y:, anchor_x:]
+            frames[i, :, anchor_y // 2: height - anchor_y // 2, anchor_x // 2: width - anchor_x // 2] = image[:, anchor_y:, anchor_x:]
         return frames
-
+    
     def _preprocess(self, ids, ids_file):
+        """
+        预处理, 保留mask像素大于1000的图片
+        """
         print("Preprocessing mask, this will take a while." + \
               "But don't worry, it only run once for each split.")
         tbar = trange(len(ids))
@@ -263,6 +249,51 @@ class COCOSegmentation(SegmentationDataset):
     
     def __len__(self):
         return len(self.ids)
+
+
+
+class test_dataset(torch.utils.data.Dataset):
+
+    def __init__(self, path='../datasets/coco/val2017', transform=None, output_size=(480,480), stride=1, **kwargs):
+        super(test_dataset, self).__init__(path, transform, **kwargs)
+        self.path = path
+        self.transform = transform
+        self.stride = stride
+        self.img_names = os.listdir(path)
+        self.output_size = output_size
+
+    def __getitem__(self, index):
+        img_id = self.img_names[index]
+        img = Image.open(os.path.join(self.path, img_id)).convert('RGB')
+        # general resize, normalize and toTensor
+        if self.transform is not None:
+            img = self.transform(img)
+        frames = torch.diff(self.generate_dynamic_translation(img), dim=0)
+        p_img = torch.zeros_like(frames)
+        n_img = torch.zeros_like(frames)
+        p_img[frames > 0] = frames[frames > 0]
+        n_img[frames < 0] = frames[frames < 0]
+        output = torch.concat([p_img, n_img], dim=1)
+        return output
+
+    def generate_dynamic_translation(self, image):
+        tracex = self.stride * 2 * np.array([0, 2, 1, 0, 2, 1, 1, 2, 1])
+        tracey = self.stride * 2 * np.array([0, 1, 2, 1, 0, 2, 1, 1, 2])
+
+        num_frames = len(tracex)
+        channel = image.shape[0]
+        height = image.shape[1]
+        width = image.shape[2]
+        
+        frames = torch.zeros((num_frames, channel, height, width))
+        for i in range(num_frames):
+            anchor_x = tracex[i]
+            anchor_y = tracey[i]
+            frames[i, :, anchor_y // 2: height - anchor_y // 2, anchor_x // 2: width - anchor_x // 2] = image[:, anchor_y:, anchor_x:]
+        return frames
+
+    def __len__(self):
+        return len(self.img_names)
 
 if __name__ == '__main__':
     input_transform = transforms.Compose([

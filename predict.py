@@ -5,8 +5,12 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
-from dataset import SegmentationDataset
+from dataset import test_dataset
 from model import SegmentModel
+from braincog.base.node.node import *
+from torchvision import transforms
+from braincog.utils import setup_seed
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -25,13 +29,16 @@ if __name__ == '__main__':
     output_size = args.output_size
     output_dir = args.output_dir
     device = 'cuda:0'
-
+    input_transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((.485, .456, .406), (.229, .224, .225)),
+    ])
     # get image
-    test_data = SegmentationDataset(root=img_path)
+    test_data = test_dataset(root=img_path)
     test_iter = DataLoader(test_data, batch_size=1, shuffle=True, num_workers=0)
 
 
-    net = SegmentModel(output_size=output_size, out_cls=train_dataset.num_class, node=BiasLIFNode, step=step)
+    net = SegmentModel(output_size=output_size, out_cls=21, node=BiasLIFNode, step=step)
     # load model
     torch.load(net, device, './checkpoints/Segment_SNN.pth')
     net = net.to(device)
