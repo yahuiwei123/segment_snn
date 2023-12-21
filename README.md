@@ -32,6 +32,8 @@ python train.py --batch_size 8 --step 8 --learning_rate 0.01 --num_epochs 100 -o
 python predict.py --image_path './test/img' --step 8 --output_size (480, 480) --output_dir './test/out'
 ```
 ### 模型细节
++ 快速眼动法生成dvs数据集
+  + 每张图片通过移动差分生成8张差分序列（包括原数据共9帧），差分后的dvs数据包括正负两通道，在通道维拼接（6通道），输入到模型中。
 + 对模型中的如下模块进行了替换
   + Conv2D $\rightarrow$ LayerWiseConvModule
   + Linear $\rightarrow$ LayerWiseLinearModule
@@ -43,9 +45,11 @@ python predict.py --image_path './test/img' --step 8 --output_size (480, 480) --
 + 我们在nminst数据集上训练17个epoch后的结果
 <img width="503" alt="94d9608c9238ed6bfae8465e9da21d9" src="https://github.com/yahuiwei123/segment_snn/assets/84215971/99bc2e72-d151-4a2b-bdce-2b81c9982185">
 
-+ 训练的Kaggle Notebook（包括FCN和SNN）：https://www.kaggle.com/code/littleweakweak/test-pycocotools
-
 #### 第二阶段（分割）
+由于计算资源有限，仅使用小样本数据集进行训练，数据集分布不均匀，因此模型收敛速度较慢，以下是相应的训练结果。
++ 训练的Kaggle Notebook（包括FCN和SNN）：https://www.kaggle.com/code/littleweakweak/test-pycocotools
+后续在增大数据集规模后，可考虑进一步改进模型，以获得更好的训练效果。
+
 ### 成员分工
 + 韦亚辉：VGG分割模型向Snn模型转化 模型训练
 + 徐一翀：数据预处理 基于快速眼动算法的dvs数据集转化 模型训练
