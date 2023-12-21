@@ -104,7 +104,7 @@ class COCOSegmentation(SegmentationDataset):
                 1, 64, 20, 63, 7, 72]
     NUM_CLASS = 21
 
-    def __init__(self, root='../datasets/coco', annotation_root='', split='train', mode=None, transform=None, stride=1, **kwargs):
+    def __init__(self, root='../datasets/coco/val2017', annotation_root='', split='train', mode=None, transform=None, stride=1, **kwargs):
         """
         Parameters: 
         ----------
@@ -140,7 +140,7 @@ class COCOSegmentation(SegmentationDataset):
             print('val set')
             ann_file = os.path.join(annotation_root, 'annotations/instances_val2017.json')
             ids_file = os.path.join(annotation_root, 'annotations/val_ids.mx')
-            self.root = os.path.join(root, 'val2017')
+            self.root = root
         self.coco = COCO(ann_file)
         self.coco_mask = mask
         if os.path.exists(ids_file):
@@ -255,7 +255,7 @@ class COCOSegmentation(SegmentationDataset):
 class test_dataset(torch.utils.data.Dataset):
 
     def __init__(self, path='../datasets/coco/val2017', transform=None, output_size=(480,480), stride=1, **kwargs):
-        super(test_dataset, self).__init__(path, transform, **kwargs)
+        super(test_dataset, self).__init__()
         self.path = path
         self.transform = transform
         self.stride = stride

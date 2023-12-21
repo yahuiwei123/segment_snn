@@ -45,9 +45,8 @@ if __name__ == '__main__':
     with torch.no_grad():
         for (idx, img) in enumerate(test_iter):
             logits = net(img.to(device))
-            softmax = nn.Softmax(dim=1)
-            logits = softmax(logits)
             mask = torch.argmax(logits, dim=1)
-            cv2.imwrite(f"{output_dir}/mask.png", mask)
+            for m in mask:
+                cv2.imwrite(f"{output_dir}/mask_{idx}.png", m.cpu().numpy())
 
 
